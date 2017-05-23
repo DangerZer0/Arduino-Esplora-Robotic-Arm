@@ -164,11 +164,17 @@ void loop() {
   yCurrServ = myservoY.read();
 
   delay(4);
-  int button = Esplora.readButton(SWITCH_UP);
-
-  if(button == HIGH)
+  int button = Esplora.readButton(SWITCH_UP); //Read UP Button
+  
+  //If the UP button is pressed rotate servo 4 and switch_up++
+  //Thus the claw closes up
+  if(button == HIGH) {
     myservoH.write(0);
     switch_up++;
+  }
+  
+  //If the UP button is pressed twice switch-- and rotate servo 4 to a basic positin
+  //Thus the claw opens up
   if(button == HIGH)
     if(switch_up==1) {
       switch_up--;
