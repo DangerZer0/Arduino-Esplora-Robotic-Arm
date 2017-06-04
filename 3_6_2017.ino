@@ -38,12 +38,13 @@ long time = 0;         // The last time the output pin was toggled
 long debounce1 = 200;   // The debounce time, increase if the output flickers
 int state1 = HIGH;      // The current state of the output pin
 int previous1 = LOW;    // The previous reading from the input pin
+int time1 = 0;
 
 
 void setup(){
   xDefServ = 90;              // Default servo X angle
   yDefServ = 180;              // Default servo Y angle
-  zDefServ = 120;              // Default servo Z angle
+  zDefServ = 70;              // Default servo Z angle
   
   myservoX.attach(11);        // Initialize first servo on D11
   myservoX.write(xDefServ);   // Set servo to default X position
@@ -69,6 +70,8 @@ void setup(){
   
   stepUp = 0;               // Initialize the update speed
   pinMode(0, OUTPUT);       // Define the digital pin D0 as output pin, used to control the head grab servo motor
+  pinMode(1, OUTPUT);
+  pinMode(3, OUTPUT);
   sysSpeed = map(Esplora.readSlider(), 0, 1023, 1, 8) / 4.0;     // The speed of updating position
 }
 
@@ -107,19 +110,10 @@ void backToDef() {
       yCurrServ = yCurrServ - stepUp;
     myservoY.write(yCurrServ);
     delay(calibSpeed);
-
-    //move the Z servo
-    if (zNewServ > zCurrServ)
-      zCurrServ = zCurrServ + stepUp;
-    else if (zNewServ < zCurrServ)
-      zCurrServ = zCurrServ - stepUp;
-    myservoZ.write(zCurrServ);
-    delay(calibSpeed);
   }
   // Calucalte the X, Y, Z current joystick positions
   xCurrJoy = map(xCurrServ, 0, 180, -512, 512);
   yCurrJoy = map(yCurrServ, 0, 180, -512, 512);
-  zCurrJoy = map(yCurrServ, 0, 180, -512, 512);
 }
 
 
@@ -143,6 +137,7 @@ void loop(){
         yCurrJoy = min(yCurrJoy + stepUp, 512);  // To avoid Y position overflow
       else
         yCurrJoy = max(yCurrJoy + stepUp, -512); // To avoid Y position downflow
+      state1 = LOW;
     }
     
     else{
@@ -151,8 +146,9 @@ void loop(){
         zCurrJoy = min(zCurrJoy + stepUp, 512);  // To avoid Z position overflow
       else
         zCurrJoy = max(zCurrJoy + stepUp, -512); // To avoid Z position downflow
+      state1 = HIGH;
     }
-    time = millis();    
+    time = millis();
   }
   
   previous1 = reading1;
