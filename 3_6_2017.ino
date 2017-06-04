@@ -129,30 +129,37 @@ void loop(){
     
   int reading1 = Esplora.readButton(SWITCH_RIGHT);    
     
-  if (reading1 == LOW && previous1 == HIGH && millis() - time > debounce1) {
+  if (reading1 == LOW && previous1 == HIGH && millis() - time1 > debounce1) {
     
     if (state1 == HIGH){
-      stepUp = (-1.0 * map(Esplora.readJoystickY() - yCalJoy, -512, 512, -5, 5)) * sysSpeed; // Calculate the step for the Y joystick coordinate
-      if (stepUp > 0)
-        yCurrJoy = min(yCurrJoy + stepUp, 512);  // To avoid Y position overflow
-      else
-        yCurrJoy = max(yCurrJoy + stepUp, -512); // To avoid Y position downflow
       state1 = LOW;
+      Serial.println("LOW");
     }
-    
     else{
-      stepUp = (-1.0 * map(Esplora.readJoystickY() - zCalJoy, -512, 512, -5, 5)) * sysSpeed; // Calculate the step for the Z joystick coordinate
-      if (stepUp > 0)
-        zCurrJoy = min(zCurrJoy + stepUp, 512);  // To avoid Z position overflow
-      else
-        zCurrJoy = max(zCurrJoy + stepUp, -512); // To avoid Z position downflow
       state1 = HIGH;
+      Serial.println("HIGH");
     }
-    time = millis();
+    time1 = millis();
   }
   
   previous1 = reading1;
-
+  
+  if(state1==HIGH){
+    stepUp = (-1.0 * map(Esplora.readJoystickY() - yCalJoy, -512, 512, -5, 5)) * sysSpeed; // Calculate the step for the Y joystick coordinate
+    if (stepUp > 0)
+      yCurrJoy = min(yCurrJoy + stepUp, 512);  // To avoid Y position overflow
+    else
+      yCurrJoy = max(yCurrJoy + stepUp, -512); // To avoid Y position downflow
+  }
+  
+  else{
+    stepUp = (-1.0 * map(Esplora.readJoystickY() - zCalJoy, -512, 512, -5, 5)) * sysSpeed; // Calculate the step for the Z joystick coordinate
+    if (stepUp > 0)
+      zCurrJoy = min(zCurrJoy + stepUp, 512);  // To avoid Z position overflow
+    else
+      zCurrJoy = max(zCurrJoy + stepUp, -512); // To avoid Z position downflow 
+  }
+  
   myservoX.write(map(xCurrJoy, -512, 512, 0, 180));   // Write the X position to the servo
   myservoY.write(map(yCurrJoy, -512, 512, 0, 180));   // Write the Y position to the servo
   myservoZ.write(map(zCurrJoy, -512, 512, 0, 180));   // Write the Z position to the servo
